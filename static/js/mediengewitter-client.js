@@ -12,5 +12,24 @@ socket.connect();
 socket.send('some data');
 
 socket.on('message', function(data){
-  alert('got some data' + data);
+  try {
+    var imageData = JSON.parse(data);
+    writeImage(imageData);
+  } catch(e) {
+    alert(e);
+  }
 });
+
+function writeImage(imageData) {
+  var image = document.getElementById("imagedata");
+  image.src = getDataUri(imagedata);
+}
+
+function getDataUri(imagedata) {
+  return "data:image/" + imagedata.filetype + ":base64," + imagedata.data;
+}
+
+function doIt() {
+  var content = "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
+  writeImage(content);
+};
