@@ -4,7 +4,7 @@ path = require('path'),
 http = require('http'),
 logging = require('./lib/streamlogger'),
 paperboy = require('./lib/paperboy'),
-io = require('./lib/socket.io.js'),
+io = require('./lib/socket.io'),
 logger = new logging.StreamLogger('./log/mediengewitter.log'),
 PORT = 8080,
 WEBROOT = path.join(path.dirname(__filename), 'static');
@@ -41,15 +41,14 @@ server.listen(PORT);
 
 var socket = io.listen(server);
 
-socket.on('connection', function(client) {
-
+function doAction() {
   setTimeout(function() {
-    client.broadcast("Hallo!");
+    socket.broadcast("Hallo!");
+    doAction();
   }, 3000);
+}
 
-});
-
-
+doAction();
 
 function log(statCode, url, ip,err) {
   var logStr = statCode + ' - ' + url + ' - ' + ip;
