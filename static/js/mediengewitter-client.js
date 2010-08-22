@@ -7,37 +7,57 @@
  *
  */
 
-io.setPath('js/socket.io/');
+(function() {
 
-var socket = new io.Socket(window.location.hostname, { port: window.location.port });
-socket.connect();
+   if (isSupported()) {
+      var socket = new WebSocket(getWebSocketUri());
 
-socket.on('message', function(data){
-  try {
-    var imageData = JSON.parse(data);
-    writeImage(imageData);
-  } catch(e) {
-    alert(e);
-  }
-});
+      socket.onmessage = function(msg){
+         var data = msg.data;
+         var imageData = JSON.parse(data);
+         writeImage(imageData);
+      };
 
-function writeImage(imageData) {
-  var image = document.getElementById("imagedata");
-  image.src = getDataUri(imageData);
-  adjustImageScale(image);
-}
+      socket.onclose = function() {
+         alert("Connection closed");
+      };
+   }
 
-function adjustImageScale(img) {
-  if(window.innerHeight < img.height){
-    img.style.height = '100%';
-    img.style.width = 'auto';
-  }
-  else if(window.innerWidth < img.width) {
-    img.style.width = '100%';
-    img.style.height = 'auto';
-  }
-}
+   function isSupported() {
+      return 'WebSocket' in window;
+   };
 
-function getDataUri(imageData) {
-  return "data:image/" + imageData.filetype + ";base64," + imageData.data;
-}
+   function writeImage(imageData) {
+      var image = document.getElementById("imagedata");
+      image.src = getDataUri(imageData);
+      adjustImageScale(image);
+   }
+
+
+   function adjustImageScale(img) {
+      img.style.width = 'auto';
+      img.style.height= 'auto';
+      if(img.width < img.height){
+         img.style.height = '98%';
+         img.style.width = 'auto';
+      } else {
+         img.style.height = 'auto';
+         img.style.width = '98%';
+      }
+   }
+
+   function getWebSocketUri() {
+      return "ws://" 
+      + window.location.hostname 
+      + ":" + window.location.port
+      + "/websocket";
+   }
+
+   function getDataUri(imageData) {
+      return "data:image/" 
+      + imageData.filetype 
+      + ";base64," 
+      + imageData.data;
+   }
+
+})();

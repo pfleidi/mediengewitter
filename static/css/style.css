@@ -36,6 +36,5 @@ footer, header, hgroup, menu, nav, section {
 
 #imagedata {
   max-width: 100%;
-  height: 98%;
-  width: auto;
+  max-height: 100%;
 }
