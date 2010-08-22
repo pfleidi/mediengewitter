@@ -12,6 +12,7 @@ sys = require('sys'),
 
 IMAGE_PATH = "./images/"
 NEW_IMAGES_FILE= IMAGE_PATH+"imageSum"
+DELAY=2000
 logger.level = logger.levels.debug;
 
 var server = http.createServer(function(req, res) {
@@ -83,7 +84,7 @@ function doAction() {
             socket.broadcast(toSend);
         });
     });
-    setTimeout(doAction, 500);
+    setTimeout(doAction,DELAY);
 }
 doAction();
 
