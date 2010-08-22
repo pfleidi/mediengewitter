@@ -7,7 +7,7 @@
  *
  */
 
-var socket = new io.Socket('10.42.0.135');
+var socket = new io.Socket('10.42.0.123');
 socket.connect();
 socket.send('some data');
 
@@ -26,7 +26,7 @@ function writeImage(imageData) {
 }
 
 function getDataUri(imageData) {
-  return "data:image/" + imageData.filetype + ":base64," + imageData.data;
+  return "data:image/" + imageData.filetype + ";base64," + imageData.data;
 }
 
 function doIt() {

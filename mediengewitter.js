@@ -75,15 +75,17 @@ function doAction() {
         if (err) throw err; 
         currImage = getImageName(currImage,data.split('\n'));
         logger.info("Current Image is :"+currImage);
-        fs.readFile(IMAGE_PATH+currImage,"utf8",function(err,data){
+        fs.readFile(IMAGE_PATH+currImage,"binary",function(err,data){
             if (err) throw err;
-            data = base64.encode(data) //.replace(/\\n/g,'')
+            tmpBuf = new Buffer(data,'binary')
+            data = tmpBuf.toString('base64')
             var ftype = currImage.split('.').pop();
             toSend = JSON.stringify({'data':data,'filetype':ftype});
+            sys.puts(toSend);
             socket.broadcast(toSend);
         });
     });
-    setTimeout(doAction,3000);
+    setTimeout(doAction,20000);
 }
 doAction();
 
