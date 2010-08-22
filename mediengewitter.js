@@ -1,6 +1,5 @@
 var
 sys = require('sys'),
-    base64 = require('./lib/base64'),
     path = require('path'),
     http = require('http'),
     fs = require('fs'),
