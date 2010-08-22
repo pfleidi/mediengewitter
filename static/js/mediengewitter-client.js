@@ -7,9 +7,10 @@
  *
  */
 
-var socket = new io.Socket('10.42.0.123');
+io.setPath('js/socket.io/');
+
+var socket = new io.Socket(window.location.hostname, { port: window.location.port });
 socket.connect();
-socket.send('some data');
 
 socket.on('message', function(data){
   try {
@@ -23,13 +24,20 @@ socket.on('message', function(data){
 function writeImage(imageData) {
   var image = document.getElementById("imagedata");
   image.src = getDataUri(imageData);
+  adjustImageScale(image);
+}
+
+function adjustImageScale(img) {
+  if(window.innerHeight < img.height){
+    img.style.height = '100%';
+    img.style.width = 'auto';
+  }
+  else if(window.innerWidth < img.width) {
+    img.style.width = '100%';
+    img.style.height = 'auto';
+  }
 }
 
 function getDataUri(imageData) {
   return "data:image/" + imageData.filetype + ";base64," + imageData.data;
 }
-
-function doIt() {
-  var content = "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9YGARc5KB0XV+IAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAF1JREFUGNO9zL0NglAAxPEfdLTs4BZM4DIO4C7OwQg2JoQ9LE1exdlYvBBeZ7jqch9//q1uH4TLzw4d6+ErXMMcXuHWxId3KOETnnXXV6MJpcq2MLaI97CER3N0vr4MkhoXe0rZigAAAABJRU5ErkJggg==";
-  writeImage({ data: content, filetype: "png" });
-};

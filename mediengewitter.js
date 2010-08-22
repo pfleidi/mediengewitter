@@ -83,7 +83,7 @@ function doAction() {
             socket.broadcast(toSend);
         });
     });
-    setTimeout(doAction,20000);
+    setTimeout(doAction, 500);
 }
 doAction();
 
