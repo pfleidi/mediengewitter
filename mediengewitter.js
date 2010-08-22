@@ -80,7 +80,6 @@ function doAction() {
             data = tmpBuf.toString('base64')
             var ftype = currImage.split('.').pop();
             toSend = JSON.stringify({'data':data,'filetype':ftype});
-            sys.puts(toSend);
             socket.broadcast(toSend);
         });
     });
