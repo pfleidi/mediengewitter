@@ -54,16 +54,12 @@ var socket = io.listen(server);
   * @return     next image
   */
 function getImageName(currImage,data) {
-    if ( currImage == null)
-    {
+    if ( currImage == null) {
         return data[0]
     }
-    else 
-    {
-        for (i=0; i< data.length-2 ; i++)
-        {
-            if ( data[i] == currImage )
-            {
+    else {
+        for (i=0; i< data.length-2 ; i++) {
+            if ( data[i] == currImage ) {
                 return data[i+1];
             }
         }
@@ -81,8 +77,8 @@ function doAction() {
         logger.info("Current Image is :"+currImage);
         fs.readFile(IMAGE_PATH+currImage,"utf8",function(err,data){
             if (err) throw err;
-            data = base64.encode(data)
-            ftype = currImage.split('.').pop();
+            data = base64.encode(data) //.replace(/\\n/g,'')
+            var ftype = currImage.split('.').pop();
             toSend = JSON.stringify({'data':data,'filetype':ftype});
             socket.broadcast(toSend);
         });
