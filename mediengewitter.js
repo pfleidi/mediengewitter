@@ -14,12 +14,13 @@ var Sys       = require('sys'),
     Connect   = require('connect'),
     Websocket = require('websocket-server'),
     Fs        = require('fs'),
-    Log4js    = require('log4js'),
+    Log4js    = require('log4js')
+    Appender  = require('./lib/colorappender.js'),
     PORT      = 8080,
     WEBROOT   = __dirname + '/static',
     LOGFILE   = __dirname + '/log/mediengewitter.log';
 
-Log4js.addAppender(Log4js.consoleAppender());
+Log4js.addAppender(Appender.consoleAppender());
 Log4js.addAppender(Log4js.fileAppender(LOGFILE), 'mediengewitter');
 
 var logger = Log4js.getLogger('mediengewitter');
