@@ -10,21 +10,25 @@
  *
  */
 
-var Sys   = require('sys'),
-Connect   = require('connect'),
-Websocket = require('websocket-server'),
-Fs        = require('fs'),
-logging   = require('./lib/streamlogger'),
-logger    = new logging.StreamLogger('./log/mediengewitter.log'),
-PORT      = 8080,
-WEBROOT   = __dirname + '/static';
+var Sys       = require('sys'),
+    Connect   = require('connect'),
+    Websocket = require('websocket-server'),
+    Fs        = require('fs'),
+    Log4js    = require('log4js'),
+    PORT      = 8080,
+    WEBROOT   = __dirname + '/static',
+    LOGFILE   = __dirname + '/log/mediengewitter.log';
 
-logger.level = logger.levels.debug;
+Log4js.addAppender(Log4js.consoleAppender());
+Log4js.addAppender(Log4js.fileAppender(LOGFILE), 'mediengewitter');
+
+var logger = Log4js.getLogger('mediengewitter');
+logger.setLevel('DEBUG');
 
 //TODO make options changeable via commandline params
-var IMAGE_PATH = "./images/";
-var NEW_IMAGES_FILE = IMAGE_PATH + "imageSum";
-var DELAY = 5000;
+var IMAGE_PATH = "./images/",
+    NEW_IMAGES_FILE = IMAGE_PATH + "imageSum",
+    DELAY = 5000;
 
 var httpServer = Connect.createServer(
   Connect.cache(),
@@ -33,8 +37,9 @@ var httpServer = Connect.createServer(
   Connect.errorHandler({ showStack: true })
 );
 
-
-httpServer.listen(PORT);
+httpServer.listen(PORT, function () {
+  logger.debug('Webserver successfully started.');
+});
 
 var webSocketServer = Websocket.createServer({
     debug: false,
@@ -63,16 +68,17 @@ function getImageName(currImage, data) {
 
 var currImage = null; //TODO unGlobal me
 
-function doAction() {
+(function doAction() {
   // TODO refactor me!
   Fs.readFile(NEW_IMAGES_FILE, "utf8", function (err, data) {
       if (err) {
         throw err;
       }
       currImage = getImageName(currImage, data.split('\n'));
-      logger.info("Current Image is :" + currImage);
+      logger.info("Current Image is : " + currImage);
       Fs.readFile(IMAGE_PATH + currImage, "binary", function (err, data) {
           if (err) {
+            logger.error("Error caught: " + err.stack);
             throw err;
           }
 
@@ -85,6 +91,4 @@ function doAction() {
         });
     });
   setTimeout(doAction, DELAY);
-}
-
-doAction();
+}());
