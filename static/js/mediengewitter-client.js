@@ -15,6 +15,7 @@
       socket.onmessage = function(msg){
          var data = msg.data;
          var imageData = JSON.parse(data);
+
          writeImage(imageData);
       };
 

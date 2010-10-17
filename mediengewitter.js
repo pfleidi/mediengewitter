@@ -10,56 +10,35 @@
  *
  */
 
-var
-sys = require('sys'),
-path = require('path'),
-http = require('http'),
-fs = require('fs'),
-logging = require('./lib/streamlogger'),
-paperboy = require('./lib/paperboy'),
-websocket = require('./lib/ws'),
-logger = new logging.StreamLogger('./log/mediengewitter.log'),
-PORT = 8080,
-WEBROOT = path.join(path.dirname(__filename), 'static');
+var Sys   = require('sys'),
+Connect   = require('connect'),
+Websocket = require('./lib/ws'),
+Fs        = require('fs'),
+logging   = require('./lib/streamlogger'),
+logger    = new logging.StreamLogger('./log/mediengewitter.log'),
+PORT      = 8080,
+WEBROOT   = __dirname + '/static';
 
 logger.level = logger.levels.debug;
 
 //TODO make options changeable via commandline params
 var IMAGE_PATH = "./images/";
-var NEW_IMAGES_FILE= IMAGE_PATH+"imageSum";
-var DELAY=2000;
+var NEW_IMAGES_FILE = IMAGE_PATH + "imageSum";
+var DELAY = 5000;
 
-var httpServer = http.createServer(function(req, res) {
-   var ip = req.connection.remoteAddress;
-   paperboy
-   .deliver(WEBROOT, req, res)
-   .addHeader('Expires', 300)
-   .addHeader('X-PaperRoute', 'Node')
-   .before(function() {
-      sys.log('Received Request')
-   })
-   .after(function(statCode) {
-      res.write('Delivered: '+req.url);
-      log(statCode, req.url, ip);
-   })
-   .error(function(statCode,msg) {
-      res.writeHead(statCode, {'Content-Type': 'text/plain'});
-      res.write("Error: " + statCode);
-      res.close();
-      log(statCode, req.url, ip, msg);
-   })
-   .otherwise(function(err) {
-      var statCode = 404;
-      res.writeHead(statCode, {'Content-Type': 'text/plain'});
-      log(statCode, req.url, ip, err);
-   });
-});
+var httpServer = Connect.createServer(
+  Connect.cache(),
+  Connect.staticProvider(WEBROOT),
+  Connect.gzip(),
+  Connect.errorHandler({ showStack: true })
+);
+
 
 httpServer.listen(PORT);
 
-var webSocketServer = websocket.createServer({
-   debug: false,
-}, httpServer);
+var webSocketServer = Websocket.createServer({
+    debug: false,
+  }, httpServer);
 
 /** 
  * calculates the next image from the given array
@@ -71,48 +50,40 @@ var webSocketServer = websocket.createServer({
  * @return     next image
  */
 
-function getImageName(currImage,data) {
-   if ( currImage == null) {
-      return data[0]
-   }
-   else {
-      for (i=0; i< data.length-2 ; i++) {
-         if ( data[i] == currImage ) {
-            return data[i+1];
-         }
-      }
-      logger.info("rewinding...")
-      return data[0];
-   }
+function getImageName(currImage, data) {
+  if (!currImage) {
+    return data[0];
+  } else {
+    return data[data.indexOf(currImage) + 1];
+  }
+  logger.info("rewinding...");
+  return data[0];
 }
 
 var currImage = null; //TODO unGlobal me
 
 function doAction() {
-   // TODO refactor me!
-   fs.readFile(NEW_IMAGES_FILE, "utf8", function(err,data){
-      if (err) throw err; 
-      currImage = getImageName(currImage,data.split('\n'));
-      logger.info("Current Image is :"+currImage);
-      fs.readFile(IMAGE_PATH+currImage,"binary",function(err,data){
-         if (err) throw err;
-         tmpBuf = new Buffer(data,'binary')
-         data = tmpBuf.toString('base64')
-         var ftype = currImage.split('.').pop();
-         toSend = JSON.stringify({'data':data,'filetype':ftype});
-         webSocketServer.broadcast(toSend);
-      });
-   });
-   setTimeout(doAction,DELAY);
+  // TODO refactor me!
+  Fs.readFile(NEW_IMAGES_FILE, "utf8", function (err, data) {
+      if (err) {
+        throw err;
+      }
+      currImage = getImageName(currImage, data.split('\n'));
+      logger.info("Current Image is :" + currImage);
+      Fs.readFile(IMAGE_PATH + currImage, "binary", function (err, data) {
+          if (err) {
+            throw err;
+          }
+
+          var tmpBuf = new Buffer(data, 'binary'),
+          base64data = tmpBuf.toString('base64'),
+          fileType = currImage.split('.').pop(),
+          toSend = JSON.stringify({'data': base64data, 'filetype': fileType});
+
+          webSocketServer.broadcast(toSend);
+        });
+    });
+  setTimeout(doAction, DELAY);
 }
 
 doAction();
-
-function log(statCode, url, ip,err) {
-   var logStr = statCode + ' - ' + url + ' - ' + ip;
-   if (err) {
-      logStr += ' - ' + err;
-   }
-   logger.info(logStr);
-}
-
