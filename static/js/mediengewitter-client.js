@@ -30,7 +30,7 @@
 
    function writeImage(imageData) {
       var image = document.getElementById("imagedata");
-      image.src = getDataUri(imageData);
+      image.src = imageData['data'];
       adjustImageScale(image);
    }
 
@@ -52,13 +52,6 @@
       + window.location.hostname 
       + ":" + window.location.port
       + "/websocket";
-   }
-
-   function getDataUri(imageData) {
-      return "data:image/" 
-      + imageData.filetype 
-      + ";base64," 
-      + imageData.data;
    }
 
 })();

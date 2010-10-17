@@ -26,9 +26,9 @@ var logger = Log4js.getLogger('mediengewitter');
 logger.setLevel('DEBUG');
 
 //TODO make options changeable via commandline params
-var IMAGE_PATH = "./images/",
+var IMAGE_PATH = "static/image/",
     NEW_IMAGES_FILE = IMAGE_PATH + "imageSum",
-    DELAY = 5000;
+    DELAY = 7500;
 
 var httpServer = Connect.createServer(
   Connect.cache(),
@@ -65,8 +65,7 @@ function getImageName(currImage, data) {
   logger.info("rewinding...");
   return data[0];
 }
-
-var currImage = null; //TODO unGlobal me
+var currImage = null; // UNglobalize me
 
 (function doAction() {
   // TODO refactor me!
@@ -76,19 +75,8 @@ var currImage = null; //TODO unGlobal me
       }
       currImage = getImageName(currImage, data.split('\n'));
       logger.info("Current Image is : " + currImage);
-      Fs.readFile(IMAGE_PATH + currImage, "binary", function (err, data) {
-          if (err) {
-            logger.error("Error caught: " + err.stack);
-            throw err;
-          }
-
-          var tmpBuf = new Buffer(data, 'binary'),
-          base64data = tmpBuf.toString('base64'),
-          fileType = currImage.split('.').pop(),
-          toSend = JSON.stringify({'data': base64data, 'filetype': fileType});
-
-          webSocketServer.broadcast(toSend);
-        });
+      toSend = JSON.stringify({'data': 'image/'+ currImage });
+      webSocketServer.broadcast(toSend);
     });
   setTimeout(doAction, DELAY);
 }());
