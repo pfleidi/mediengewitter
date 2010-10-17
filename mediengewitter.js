@@ -12,7 +12,7 @@
 
 var Sys   = require('sys'),
 Connect   = require('connect'),
-Websocket = require('./lib/ws'),
+Websocket = require('websocket-server'),
 Fs        = require('fs'),
 logging   = require('./lib/streamlogger'),
 logger    = new logging.StreamLogger('./log/mediengewitter.log'),
@@ -38,7 +38,8 @@ httpServer.listen(PORT);
 
 var webSocketServer = Websocket.createServer({
     debug: false,
-  }, httpServer);
+    server: httpServer
+  });
 
 /** 
  * calculates the next image from the given array
