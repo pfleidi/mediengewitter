@@ -7,6 +7,6 @@ Mediengewitter is a [node.js](http://nodejs.org) framework to push images to all
 Dependencies
 ------------
 
-Mediengewitter needs a number of 3rd party libraries you can install them with [npm](http://npmjs.org):
+Mediengewitter needs a number of 3rd party libraries. You can install them with [npm](http://npmjs.org):
 
     npm install connect websocket-server
