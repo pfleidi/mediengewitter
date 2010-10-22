@@ -14,7 +14,7 @@ var Sys       = require('sys'),
     Connect   = require('connect'),
     Websocket = require('websocket-server'),
     Fs        = require('fs'),
-    Log4js    = require('log4js')
+    Log4js    = require('log4js'),
     Appender  = require('./lib/colorappender.js'),
     PORT      = 8080,
     WEBROOT   = __dirname + '/static',
@@ -27,9 +27,9 @@ var logger = Log4js.getLogger('mediengewitter');
 logger.setLevel('DEBUG');
 
 //TODO make options changeable via commandline params
-var IMAGE_PATH = "static/image/",
+var IMAGE_PATH = "static/content/",
     NEW_IMAGES_FILE = IMAGE_PATH + "imageSum",
-    DELAY = 7500;
+    DELAY = 5500;
 
 var httpServer = Connect.createServer(
   Connect.cache(),
@@ -76,7 +76,7 @@ var currImage = null; // UNglobalize me
       }
       currImage = getImageName(currImage, data.split('\n'));
       logger.info("Current Image is : " + currImage);
-      toSend = JSON.stringify({'data': 'image/'+ currImage });
+      toSend = JSON.stringify({'data': 'content/'+ currImage });
       webSocketServer.broadcast(toSend);
     });
   setTimeout(doAction, DELAY);

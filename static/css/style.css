@@ -1,6 +1,6 @@
 /* 
 style.css contains some really basic css styles
-*/
+ */
 
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -28,13 +28,15 @@ footer, header, hgroup, menu, nav, section {
   display:block;
 }
 
-#main {
+section {
   text-align:center;
   width: 100%;
   height: 100%;
 }
 
 #imagedata {
-  max-width: 100%;
-  max-height: 100%;
+  height: 99%;
+  width: auto;
+  max-width: 99%;
+  max-height: 99%;
 }
