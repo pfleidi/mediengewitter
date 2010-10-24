@@ -29,7 +29,7 @@ logger.setLevel('DEBUG');
 //TODO make options changeable via commandline params
 var IMAGE_PATH = "static/content/",
     NEW_IMAGES_FILE = IMAGE_PATH + "imageSum",
-    DELAY = 5500;
+    DELAY = 7500;
 
 var httpServer = Connect.createServer(
   Connect.cache(),
