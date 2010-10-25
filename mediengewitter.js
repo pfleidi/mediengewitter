@@ -58,13 +58,7 @@ var webSocketServer = Websocket.createServer({
  */
 
 function getImageName(currImage, data) {
-  if (!currImage) {
-    return data[0];
-  } else {
-    return data[data.indexOf(currImage) + 1];
-  }
-  logger.info("rewinding...");
-  return data[0];
+  return data[Math.floor(data.length * Math.random())];
 }
 var currImage = null; // UNglobalize me
 
