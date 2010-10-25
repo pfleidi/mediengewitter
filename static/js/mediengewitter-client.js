@@ -12,6 +12,10 @@
         adjustRatio(); 
       });
 
+    $(window).resize(function () {
+        adjustRatio(); 
+      });
+
     if (isSupported()) {
       var socket = new WebSocket(getWebSocketUri());
 
@@ -39,13 +43,10 @@
 
     function adjustRatio() {
       var img = $('#imagedata');
-      img.css({'height': 'auto', 'width': 'auto' });
-
-      if (img.width() <= img.height()) {
-        img.css({'height': '99%', 'width': 'auto' });
-      } else {
-        img.css({'height': 'auto', 'width': '99%' });
-      }
+      img.aeImageResize({
+          height: $('#container').height(),
+          width: $('#container').width()
+        });
     }
 
     function getWebSocketUri() {
