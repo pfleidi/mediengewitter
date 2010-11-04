@@ -7,7 +7,9 @@
  *
  */
 
-(function () {
+(function (window, undefined) {
+    var enabled = true;
+
     $(document).ready(function () {
         adjustRatio(); 
       });
@@ -16,20 +18,37 @@
         adjustRatio(); 
       });
 
-    if (isSupported()) {
-      var socket = new WebSocket(getWebSocketUri());
+    $(document).keydown(function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
+          return;
+        }
+        
+        if(e.keyCode === 32) {
+           e.preventDefault();
+           enabled = !enabled;
+        }
+      });
 
-      socket.onmessage = function (msg) {
-        var data = msg.data;
-        var imageData = JSON.parse(data);
 
-        writeImage(imageData);
-      };
+    (function connect() {
+        if (isSupported()) {
+          var socket = new WebSocket(getWebSocketUri());
 
-      socket.onclose = function () {
-        console.log('conncection closed');
-      };
-    }
+          socket.onmessage = function (msg) {
+            if (enabled) {
+              var data = msg.data;
+              var imageData = JSON.parse(data);
+
+              writeImage(imageData);
+            }
+          };
+
+          socket.onclose = function () {
+            console.log('conncection closed');
+            setTimeout(1000, connect);
+          };
+        }
+      }())
 
     function isSupported() {
       return 'WebSocket' in window;
@@ -56,4 +75,4 @@
       + "/websocket";
     }
 
-  }());
+  }(window));

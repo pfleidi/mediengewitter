@@ -40,7 +40,7 @@ var httpServer = Connect.createServer(
   Connect.cache(),
   Connect.staticProvider(WEBROOT),
   Connect.gzip(),
-  Connect.logger({buffer: true, stream: logStream}),
+  Connect.logger(),
   Connect.errorHandler({ showStack: true, dumpExceptions: true})
 );
 
