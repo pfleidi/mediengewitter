@@ -9,23 +9,73 @@
 
 (function (window, undefined) {
     var enabled = true;
+    var sections = [];
+
+    function isSupported() {
+      return 'WebSocket' in window;
+    }
+
+    function addImage(imageData) {
+      var next = $('<section><img src="' + imageData + '" /></section>');
+      next.addClass('new');
+      $('#container').append(next);
+
+      sections.push(next);
+    }
+
+    function showImage(section) {
+      if (section) {
+        section.removeClass('new').addClass('current'); 
+        adjustRatio();
+      }
+    }
+
+    function removeImage(section) {
+      if (section) {
+        section.removeClass('current').addClass('old');
+      }
+    }
+
+    function adjustRatio() {
+      var img = $('.current :first-child');
+      img.aeImageResize({
+          height: $('.current').height(),
+          width: $('.current').width()
+        });
+      console.log(img);
+    }
+
+    function dispatch(imgData) {
+      addImage(imgData);
+      if (sections.length > 1) {
+        removeImage($('.current'));
+        showImage(sections.shift());
+      }
+    }
+
+    function getWebSocketUri() {
+      return "ws://" 
+      + window.location.hostname 
+      + ":" + window.location.port
+      + "/websocket";
+    }
 
     $(document).ready(function () {
-        adjustRatio(); 
+        adjustRatio();
       });
 
     $(window).resize(function () {
-        adjustRatio(); 
+        adjustRatio();
       });
 
     $(document).keydown(function (e) {
         if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
           return;
         }
-        
+
         if(e.keyCode === 32) {
-           e.preventDefault();
-           enabled = !enabled;
+          e.preventDefault();
+          enabled = !enabled;
         }
       });
 
@@ -35,11 +85,12 @@
           var socket = new WebSocket(getWebSocketUri());
 
           socket.onmessage = function (msg) {
+            console.log(msg.data);
             if (enabled) {
               var data = msg.data;
               var imageData = JSON.parse(data);
 
-              writeImage(imageData);
+              dispatch(imageData.data);
             }
           };
 
@@ -49,30 +100,5 @@
           };
         }
       }())
-
-    function isSupported() {
-      return 'WebSocket' in window;
-    }
-
-    function writeImage(imageData) {
-      var imgSrc = imageData['data'];
-      $('#imagedata').attr('src', imgSrc);
-      adjustRatio();
-    }
-
-    function adjustRatio() {
-      var img = $('#imagedata');
-      img.aeImageResize({
-          height: $('#container').height(),
-          width: $('#container').width()
-        });
-    }
-
-    function getWebSocketUri() {
-      return "ws://" 
-      + window.location.hostname 
-      + ":" + window.location.port
-      + "/websocket";
-    }
 
   }(window));
