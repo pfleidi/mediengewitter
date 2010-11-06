@@ -7,7 +7,7 @@
  *
  */
 
-(function (window, undefined) {
+(function (window, document, undefined) {
     var enabled = true;
     var sections = [];
 
@@ -25,37 +25,31 @@
 
     function showImage(section) {
       if (section) {
-        section.removeClass('new').addClass('current'); 
+        $('.current').removeClass('current').addClass('old');
+        section.removeClass('new').addClass('current');
         adjustRatio();
-      }
-    }
-
-    function removeImage(section) {
-      if (section) {
-        section.removeClass('current').addClass('old');
       }
     }
 
     function adjustRatio() {
       var img = $('.current :first-child');
+      console.log(img);
       img.aeImageResize({
           height: $('.current').height(),
           width: $('.current').width()
         });
-      console.log(img);
     }
 
     function dispatch(imgData) {
       addImage(imgData);
       if (sections.length > 1) {
-        removeImage($('.current'));
         showImage(sections.shift());
       }
     }
 
     function getWebSocketUri() {
-      return "ws://" 
-      + window.location.hostname 
+      return "ws://"
+      + window.location.hostname
       + ":" + window.location.port
       + "/websocket";
     }
@@ -73,7 +67,7 @@
           return;
         }
 
-        if(e.keyCode === 32) {
+        if (e.keyCode === 32) {
           e.preventDefault();
           enabled = !enabled;
         }
@@ -101,4 +95,4 @@
         }
       }())
 
-  }(window));
+  }(window, document));
