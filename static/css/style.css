@@ -27,7 +27,6 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section { 
   display:block;
 }
-
 section {
   text-align:center;
   width: 100%;
@@ -39,4 +38,27 @@ section {
   width: auto;
   max-width: 99%;
   max-height: 99%;
+}
+footer {
+  background:transparent;
+  text-align : center;
+  width : 100%;
+  position:fixed;
+  bottom:0em;
+  display: table;
+}
+
+footer div {
+  display: table-cell;
+  width: 33%;    
+}
+
+.foot_center {
+
+}
+.foot_left {
+  text-align : left;
+}
+.foot_right {
+  text-align : right;
 }
