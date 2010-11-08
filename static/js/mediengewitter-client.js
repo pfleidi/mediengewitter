@@ -4,95 +4,158 @@
  * Connects to a websocket server and reacts to events
  *
  * @author pfleidi
+ * @author felix
  *
  */
 
+
 (function (window, document, undefined) {
-    var enabled = true;
-    var sections = [];
+  var cache = false;
 
-    function isSupported() {
-      return 'WebSocket' in window;
+  function createCache(cacheSize,initData) {
+    var out = {};
+    $('#container').empty()
+    out.stopped = false;
+    out.cacheItems = [];
+    out.center = Math.floor((cacheSize+1)/2)
+    out.current = out.center;
+    for (var i = 1; i <= cacheSize;i++) {
+      var item = genItem(initData);
+      if ( i < out.current ) {
+        item.addClass('old');
+      }
+
+      if ( i == out.current ) {
+        item.addClass('current');
+      }
+
+      if ( i > out.current ) {
+        item.addClass('new');
+      }
+      out.cacheItems.push(item);
     }
 
-    function addImage(imageData) {
-      var next = $('<section><img src="' + imageData + '" /></section>');
-      next.addClass('new');
-      $('#container').append(next);
+    out.update = function (newData)
+    {
+      if ( ! out.stopped )
+      {
+        out.cacheItems.push(genItem(newData).addClass('new'));
+        if ( out.current  <= out.center) { // get back to center 
+          this.next();
+        }
 
-      sections.push(next);
+        $('#container :first').remove()
+        out.cacheItems.shift();
+        out.current -= 1;
+      }
     }
 
-    function showImage(section) {
-      if (section) {
-        $('.current').removeClass('current').addClass('old');
-        section.removeClass('new').addClass('current');
+    out.next = function () {
+      if ( ! (out.current == out.cacheItems.length )) {
+        $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
+        out.current += 1;
+        //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
+      }else{
+        alert('Already at the last image');
       }
     }
 
-    function adjustRatio() {
-      var img = $('.current :first-child');
-      console.log(img);
-      img.aeImageResize({
-          height: $('.current').height(),
-          width: $('.current').width()
-        });
-    }
-
-    function dispatch(imgData) {
-      addImage(imgData);
-      if (sections.length > 1) {
-        showImage(sections.shift());
+    out.prev = function () {
+      if ( ! (out.current == 1 )) {
+        $('.current').removeClass('current').addClass('new').prev().removeClass('old').addClass('current');
+ ;
+        out.current -= 1;
+        adjustRatio();
+      }else{
+        alert('Already at the first image');
       }
     }
 
-    function getWebSocketUri() {
-      return "ws://"
+    out.toggleStop = function () {
+      out.stopped = !out.stopped;
+    }
+    return out;
+
+  }
+  var enabled = true;
+  var sections = [];
+
+  function isSupported() {
+    return 'WebSocket' in window;
+  }
+
+  function genItem(imageData) {
+    var next = $('<section><img src="' + imageData + '" /></section>');
+    $('#container').append(next);
+    return next;
+  }
+
+  function adjustRatio() {
+    var img = $('.current :first-child');
+    console.log(img);
+    img.aeImageResize({
+      height: $('.current').height(),
+      width: $('.current').width()
+    });
+  }
+
+
+  function getWebSocketUri() {
+    return "ws://"
       + window.location.hostname
       + ":" + window.location.port
       + "/websocket";
+  }
+
+  $(document).ready(function () {
+    adjustRatio();
+  });
+
+  $(window).resize(function () {
+    adjustRatio();
+  });
+
+  $(document).keydown(function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !cache) {
+      return;
     }
 
-    $(document).ready(function () {
-        adjustRatio();
-      });
+    if (e.keyCode === 32) {
+      e.preventDefault();
+      cache.toggleStop();
+    }
+    if (e.keyCode === 39) {
+      e.preventDefault();
+      cache.next();
+    }
+    if (e.keyCode === 37) {
+      e.preventDefault();
+      cache.prev();
+    }
+  });
 
-    $(window).resize(function () {
-        adjustRatio();
-      });
 
-    $(document).keydown(function (e) {
-        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
-          return;
+  (function connect() {
+    if (isSupported()) {
+      var socket = new WebSocket(getWebSocketUri());
+
+      socket.onmessage = function (msg) {
+        console.log(msg.data);
+        var data = msg.data;
+        var imageData = JSON.parse(data);
+        if (!cache){
+          cache = createCache(5,imageData.data)
+        }else {
+          cache.update(imageData.data);
         }
+      }
+      socket.onclose = function () {
+        console.log('conncection closed');
+        setTimeout(1000, connect);
+      };
+    };
+    
+  }())
 
-        if (e.keyCode === 32) {
-          e.preventDefault();
-          enabled = !enabled;
-        }
-      });
-
-
-    (function connect() {
-        if (isSupported()) {
-          var socket = new WebSocket(getWebSocketUri());
-
-          socket.onmessage = function (msg) {
-            console.log(msg.data);
-            if (enabled) {
-              var data = msg.data;
-              var imageData = JSON.parse(data);
-
-              dispatch(imageData.data);
-            }
-          };
-
-          socket.onclose = function () {
-            console.log('conncection closed');
-            setTimeout(1000, connect);
-          };
-        }
-      }())
-
-  }(window, document));
+}(window, document));
