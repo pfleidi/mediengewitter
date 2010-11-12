@@ -46,6 +46,16 @@ section > img {
   max-height: 99%;
 
 }
+.foot_item {
+  width : 50px;
+  max-height: 50px;
+  margin: 2px;
+}
+.current_footitem {
+  border-width : 2px;
+  border-color: black;
+  border-style : solid;
+}
 
 .new {
   -webkit-transition: -webkit-transform 1s linear;

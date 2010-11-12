@@ -17,22 +17,26 @@
     $('#container').empty()
     out.stopped = false;
     out.cacheItems = [];
+    out.cacheFoot = [];
     out.center = Math.floor((cacheSize+1)/2)
     out.current = out.center;
     for (var i = 1; i <= cacheSize;i++) {
       var item = genItem(initData);
+      var footItem = genFootItem(initData);
       if ( i < out.current ) {
         item.addClass('old');
       }
 
       if ( i == out.current ) {
         item.addClass('current');
+        footItem.addClass('current_footitem');
       }
 
       if ( i > out.current ) {
         item.addClass('new');
       }
       out.cacheItems.push(item);
+      out.cacheFoot.push(footItem);
     }
 
     out.update = function (newData)
@@ -40,12 +44,15 @@
       if ( ! out.stopped )
       {
         out.cacheItems.push(genItem(newData).addClass('new'));
+        out.cacheFoot.push(genFootItem(newData));
         if ( out.current  <= out.center) { // get back to center 
           this.next();
         }
 
         $('#container :first').remove()
+        $('#foot_center :first').remove()
         out.cacheItems.shift();
+        out.cacheFoot.shift()
         out.current -= 1;
       }
     }
@@ -53,6 +60,7 @@
     out.next = function () {
       if ( ! (out.current == out.cacheItems.length )) {
         $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
+        $('.current_footitem').removeClass('current_footitem').next().addClass('current_footitem');
         out.current += 1;
         //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
@@ -64,6 +72,7 @@
     out.prev = function () {
       if ( ! (out.current == 1 )) {
         $('.current').removeClass('current').addClass('new').prev().removeClass('old').addClass('current');
+        $('.current_footitem').removeClass('current_footitem').prev().addClass('current_footitem');
  ;
         out.current -= 1;
         adjustRatio();
@@ -88,6 +97,13 @@
   function genItem(imageData) {
     var next = $('<section><img src="' + imageData + '" /></section>');
     $('#container').append(next);
+    return next;
+  }
+
+  function genFootItem(imageData) {
+    var next = $('<img src="'+imageData+'" />');
+    next.addClass('foot_item');
+    $('#foot_center').append(next);
     return next;
   }
 
