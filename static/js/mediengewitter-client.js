@@ -65,7 +65,7 @@
         //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
       }else{
-        alert('Already at the last image');
+        console.log('Already at the last image');
       }
     }
 
@@ -77,7 +77,7 @@
         out.current -= 1;
         adjustRatio();
       }else{
-        alert('Already at the first image');
+        console.log('Already at the first image');
       }
     }
 
