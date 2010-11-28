@@ -27,6 +27,7 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display:block;
 }
+
 section {
   height: 100%;
   width: 100%;
@@ -44,13 +45,15 @@ section > img {
   width: auto;
   max-width: 99%;
   max-height: 99%;
-
+  border-radius: 15px;
 }
+
 .foot_item {
   width : 50px;
   max-height: 50px;
   margin: 2px;
 }
+
 .current_footitem {
   border-width : 2px;
   border-color: black;
@@ -83,6 +86,7 @@ section > img {
   -o-transition: -webkit-transform 1s linear;
   -o-transform: translateX(100%);
 }
+
 footer {
   background:transparent;
   text-align : center;
@@ -100,9 +104,11 @@ footer div {
 .foot_center {
 
 }
+
 .foot_left {
   text-align : left;
 }
+
 .foot_right {
   text-align : right;
 }
