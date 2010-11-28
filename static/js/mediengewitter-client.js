@@ -12,39 +12,43 @@
 (function (window, document, undefined) {
   var cache = false;
 
-  function createCache(cacheSize,initData) {
+  function createCache(initData) {
     var out = {};
-    $('#container').empty()
+
+    $('#container').empty();
+
     out.stopped = false;
     out.cacheItems = [];
     out.cacheFoot = [];
-    out.center = Math.floor((cacheSize+1)/2)
+    out.center = Math.floor((initData.length + 1)/2);
     out.current = out.center;
-    for (var i = 1; i <= cacheSize;i++) {
-      var item = genItem(initData);
-      var footItem = genFootItem(initData);
-      if ( i < out.current ) {
+
+    initData.forEach(function (img) {
+      var item = genItem(img),
+      footItem = genFootItem(img),
+      i = initData.indexOf(img);
+      
+      if (i < out.current) {
         item.addClass('old');
       }
 
-      if ( i == out.current ) {
+      if (i == out.current) {
         item.addClass('current');
         footItem.addClass('current_footitem');
       }
 
-      if ( i > out.current ) {
+      if (i > out.current) {
         item.addClass('new');
       }
       out.cacheItems.push(item);
       out.cacheFoot.push(footItem);
-    }
+    });
 
-    out.update = function (newData)
-    {
-      if ( ! out.stopped )
-      {
+    out.update = function (newData) {
+      if (!out.stopped) {
         out.cacheItems.push(genItem(newData).addClass('new'));
         out.cacheFoot.push(genFootItem(newData));
+
         if ( out.current  <= out.center) { // get back to center 
           this.next();
         }
@@ -55,31 +59,30 @@
         out.cacheFoot.shift()
         out.current -= 1;
       }
-    }
+    };
 
     out.next = function () {
-      if ( ! (out.current == out.cacheItems.length )) {
+      if (!(out.current == out.cacheItems.length)) {
         $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
         $('.current_footitem').removeClass('current_footitem').next().addClass('current_footitem');
         out.current += 1;
         //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
-      }else{
+      } else {
         console.log('Already at the last image');
       }
-    }
+    };
 
     out.prev = function () {
-      if ( ! (out.current == 1 )) {
+      if (!(out.current == 1)) {
         $('.current').removeClass('current').addClass('new').prev().removeClass('old').addClass('current');
         $('.current_footitem').removeClass('current_footitem').prev().addClass('current_footitem');
- ;
         out.current -= 1;
         adjustRatio();
-      }else{
+      } else{
         console.log('Already at the first image');
       }
-    }
+    };
 
     out.toggleStop = function () {
       out.stopped = !out.stopped;
@@ -87,6 +90,7 @@
     return out;
 
   }
+
   var enabled = true;
   var sections = [];
 
@@ -115,7 +119,6 @@
       width: $('.current').width()
     });
   }
-
 
   function getWebSocketUri() {
     return "ws://"
@@ -151,23 +154,25 @@
     }
   });
 
-
   (function connect() {
     if (isSupported()) {
       var socket = new WebSocket(getWebSocketUri());
 
       socket.onmessage = function (msg) {
-        console.log(msg.data);
-        var data = msg.data;
-        var imageData = JSON.parse(data);
-        if (!cache){
-          cache = createCache(5,imageData.data)
-        }else {
+        var data = msg.data, 
+        imageData = JSON.parse(data);
+        console.dir(imageData);
+
+        if (Array.isArray(imageData)) {
+          cache = createCache(imageData);
+        } else {
           cache.update(imageData.data);
         }
-      }
+
+      };
+
       socket.onclose = function () {
-        console.log('conncection closed');
+        console.log('Connection closed');
         setTimeout(1000, connect);
       };
     };
