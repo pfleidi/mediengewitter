@@ -26,7 +26,7 @@
     initData.forEach(function (img) {
       var item = genItem(img),
       footItem = genFootItem(img),
-      i = initData.indexOf(img);
+      i = initData.indexOf(img) + 1;
       
       if (i < out.current) {
         item.addClass('old');
@@ -91,8 +91,8 @@
 
   }
 
-  var enabled = true;
-  var sections = [];
+  var enabled = true,
+  sections = [];
 
   function isSupported() {
     return 'WebSocket' in window;
