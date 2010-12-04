@@ -28,6 +28,20 @@ footer, header, hgroup, menu, nav, section {
   display:block;
 }
 
+header {
+  height: 30px;
+  background-color: #161616;
+  background: -webkit-gradient(linear, top, bottom, from(#161616), to(#131313));
+  background: -moz-linear-gradient(top, bottom, from(#161616), to(#131313));
+  background: linear-gradient(top, bottom, from(#161616), to(#131313));
+  border-bottom: 5px solid #acd86e;
+}
+
+header .heading {
+  color: #e0e0e0;
+  font-size: 25px;
+}
+
 #container {
   display: block;
   width: 100%;
@@ -63,20 +77,20 @@ section > img {
   width: auto;
   max-width: 99%;
   max-height: 99%;
-  border-radius: 20px;
+  box-shadow: 10px 10px 5px #888;
 }
 
-.new {
+section.new {
   margin-left: 2000px;
   display: block;
 }
 
-.current {
+section.current {
   visibility: visible;
   display: block;
 }
 
-.old {
+section.old {
   margin-left: -2000px;
   display: block;
 }
@@ -95,33 +109,31 @@ footer div {
   width: 33%;    
 }
 
-.foot_center {
+footer .foot_center {
 
 }
 
-.foot_left {
+footer .foot_left {
   text-align : left;
 }
 
-.foot_right {
+footer .foot_right {
   text-align : right;
 }
 
 
-.foot_item {
+footer .foot_item {
   height: 60px;
   width : auto;
   max-width: 80px;
   margin: 2px;
-  border-radius: 5px;
   -webkit-transition: all .25s ease-in-out;
   -moz-transition: all 0.25s ease-in-out;
   -o-transition: all 0.25s ease-in-out;
   transition: all 0.25s ease-in-out;
-
 }
 
-.current_footitem {
+footer .current_footitem {
   -webkit-transform: scale(1.2);
   -moz-transform: scale(1.2);
   -o-transform: scale(1.2);
