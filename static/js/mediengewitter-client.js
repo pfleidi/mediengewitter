@@ -12,6 +12,12 @@
 (function (window, document, undefined) {
   var cache = false;
 
+  function log(msg) {
+    try {
+      console.log(msg);
+    } catch (e) { }
+  }
+
   function createCache(initData) {
     var out = {};
 
@@ -69,7 +75,7 @@
         //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
       } else {
-        console.log('Already at the last image');
+        log('Already at the last image');
       }
     };
 
@@ -80,7 +86,7 @@
         out.current -= 1;
         adjustRatio();
       } else {
-        console.log('Already at the first image');
+        log('Already at the first image');
       }
     };
 
@@ -105,7 +111,6 @@
       socket.onmessage = function (msg) {
         var data = msg.data,
         imageData = JSON.parse(data);
-        console.dir(imageData);
 
         if (Array.isArray(imageData)) {
           cache = createCache(imageData);
@@ -116,12 +121,12 @@
       };
 
       socket.onerror = function () {
-        console.log('Error!');
+        log('Error!');
         setTimeout(1000, connect);
       };
 
       socket.onclose = function () {
-        console.log('Connection closed');
+        log('Connection closed');
         setTimeout(1000, connect);
       };
     }
@@ -143,7 +148,7 @@
 
   function adjustRatio() {
     var img = $('.current :first-child');
-    console.log(img);
+    log(img);
     img.aeImageResize({
       height: $('.current').height(),
       width: $('.current').width()

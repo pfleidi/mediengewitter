@@ -109,12 +109,23 @@ footer div {
 
 
 .foot_item {
-  width : 50px;
-  max-height: 50px;
+  height: 60px;
+  width : auto;
+  max-width: 80px;
   margin: 2px;
+  border-radius: 5px;
+  -webkit-transition: all .25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
+
 }
 
 .current_footitem {
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -o-transform: scale(1.2);
+  transform: scale(1.2);
   border-width : 2px;
   border-color: black;
   border-style : solid;
