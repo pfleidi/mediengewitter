@@ -20,19 +20,19 @@
     out.stopped = false;
     out.cacheItems = [];
     out.cacheFoot = [];
-    out.center = Math.floor((initData.length + 1)/2);
+    out.center = Math.floor((initData.length + 1) / 2);
     out.current = out.center;
 
     initData.forEach(function (img) {
       var item = genItem(img),
       footItem = genFootItem(img),
       i = initData.indexOf(img) + 1;
-      
+
       if (i < out.current) {
         item.addClass('old');
       }
 
-      if (i == out.current) {
+      if (i === out.current) {
         item.addClass('current');
         footItem.addClass('current_footitem');
       }
@@ -49,20 +49,20 @@
         out.cacheItems.push(genItem(newData).addClass('new'));
         out.cacheFoot.push(genFootItem(newData));
 
-        if ( out.current  <= out.center) { // get back to center 
+        if ( out.current  <= out.center) { // get back to center
           this.next();
         }
 
-        $('#container :first').remove()
-        $('#foot_center :first').remove()
+        $('#container :first').remove();
+        $('#foot_center :first').remove();
         out.cacheItems.shift();
-        out.cacheFoot.shift()
+        out.cacheFoot.shift();
         out.current -= 1;
       }
     };
 
     out.next = function () {
-      if (!(out.current == out.cacheItems.length)) {
+      if (!(out.current === out.cacheItems.length)) {
         $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
         $('.current_footitem').removeClass('current_footitem').next().addClass('current_footitem');
         out.current += 1;
@@ -74,21 +74,21 @@
     };
 
     out.prev = function () {
-      if (!(out.current == 1)) {
+      if (!(out.current === 1)) {
         $('.current').removeClass('current').addClass('new').prev().removeClass('old').addClass('current');
         $('.current_footitem').removeClass('current_footitem').prev().addClass('current_footitem');
         out.current -= 1;
         adjustRatio();
-      } else{
+      } else {
         console.log('Already at the first image');
       }
     };
 
     out.toggleStop = function () {
       out.stopped = !out.stopped;
-    }
-    return out;
+    };
 
+    return out;
   }
 
   var enabled = true,
@@ -98,6 +98,36 @@
     return 'WebSocket' in window;
   }
 
+  function connect() {
+    if (isSupported()) {
+      var socket = new WebSocket(getWebSocketUri());
+
+      socket.onmessage = function (msg) {
+        var data = msg.data,
+        imageData = JSON.parse(data);
+        console.dir(imageData);
+
+        if (Array.isArray(imageData)) {
+          cache = createCache(imageData);
+        } else {
+          cache.update(imageData.data);
+        }
+
+      };
+
+      socket.onerror = function () {
+        console.log('Error!');
+        setTimeout(1000, connect);
+      };
+
+      socket.onclose = function () {
+        console.log('Connection closed');
+        setTimeout(1000, connect);
+      };
+    }
+
+  }
+
   function genItem(imageData) {
     var next = $('<section><img src="' + imageData + '" /></section>');
     $('#container').append(next);
@@ -105,7 +135,7 @@
   }
 
   function genFootItem(imageData) {
-    var next = $('<img src="'+imageData+'" />');
+    var next = $('<img src="' + imageData + '" />');
     next.addClass('foot_item');
     $('#foot_center').append(next);
     return next;
@@ -129,6 +159,7 @@
 
   $(document).ready(function () {
     adjustRatio();
+    connect();
   });
 
   $(window).resize(function () {
@@ -153,30 +184,5 @@
       cache.prev();
     }
   });
-
-  (function connect() {
-    if (isSupported()) {
-      var socket = new WebSocket(getWebSocketUri());
-
-      socket.onmessage = function (msg) {
-        var data = msg.data, 
-        imageData = JSON.parse(data);
-        console.dir(imageData);
-
-        if (Array.isArray(imageData)) {
-          cache = createCache(imageData);
-        } else {
-          cache.update(imageData.data);
-        }
-
-      };
-
-      socket.onclose = function () {
-        console.log('Connection closed');
-        setTimeout(1000, connect);
-      };
-    };
-    
-  }())
 
 }(window, document));
