@@ -28,63 +28,57 @@ footer, header, hgroup, menu, nav, section {
   display:block;
 }
 
-section {
-  height: 100%;
+#container {
+  display: block;
   width: 100%;
+  height: 94%;
+  left: 0;
+  top: 0;
+  text-align: center;
   position: absolute;
   overflow: hidden;
-  text-align: center;
+
+  margin-top: 50px;
   background-color: #eee;
   background: -webkit-gradient(linear, left bottom, left top, from(#bbd), to(#fff));
   background: -moz-linear-gradient(bottom, #bbd, #fff);
   background: linear-gradient(bottom, #bbd, #fff);
 }
 
-section > img {
+section {
+  display: none;
+  position: absolute;
+  overflow: hidden;
+  width: 99%;
   height: 99%;
+
+  -webkit-transition: margin 0.75s ease-in-out;
+  -moz-transition: margin 0.75s ease-in-out;
+  -o-transition: margin-left 0.75s ease-in-out;
+  transition: margin 0.75s ease-in-out;
+}
+
+section > img {
+  height: 92%;
   width: auto;
   max-width: 99%;
   max-height: 99%;
-  border-radius: 15px;
-}
-
-.foot_item {
-  width : 50px;
-  max-height: 50px;
-  margin: 2px;
-}
-
-.current_footitem {
-  border-width : 2px;
-  border-color: black;
-  border-style : solid;
+  border-radius: 20px;
 }
 
 .new {
-  -webkit-transition: -webkit-transform 1s linear;
-  -webkit-transform: translateX(-100%);
-  -moz-transition: -webkit-transform 1s linear;
-  -moz-transform: translateX(-100%);
-  -o-transition: -webkit-transform 1s linear;
-  -o-transform: translateX(-100%);
+  margin-left: 2000px;
+  display: block;
 }
 
 .current {
-  -webkit-transition: -webkit-transform 1s linear;
-  -webkit-transform: translateX(0);
-  -moz-transition: -webkit-transform 1s linear;
-  -moz-transform: translateX(0);
-  -o-transition: -webkit-transform 1s linear;
-  -o-transform: translateX(0);
+  visibility: visible;
+  display: block;
 }
 
 .old {
-  -webkit-transition: -webkit-transform 1s linear;
-  -webkit-transform: translateX(100%);
-  -moz-transition: -webkit-transform 1s linear;
-  -moz-transform: translateX(100%);
-  -o-transition: -webkit-transform 1s linear;
-  -o-transform: translateX(100%);
+  margin-left: -2000px;
+  display: block;
 }
 
 footer {
@@ -111,4 +105,17 @@ footer div {
 
 .foot_right {
   text-align : right;
+}
+
+
+.foot_item {
+  width : 50px;
+  max-height: 50px;
+  margin: 2px;
+}
+
+.current_footitem {
+  border-width : 2px;
+  border-color: black;
+  border-style : solid;
 }
