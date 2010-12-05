@@ -25,13 +25,14 @@
 
     out.stopped = false;
     out.cacheItems = [];
-    out.cacheFoot = [];
+    out.thumbnails = [];
+
     out.center = Math.floor((initData.length + 1) / 2);
     out.current = out.center;
 
     initData.forEach(function (img) {
       var item = genItem(img),
-      footItem = genFootItem(img),
+      thumbnail = genThumbnail(img),
       i = initData.indexOf(img) + 1;
 
       if (i < out.current) {
@@ -40,29 +41,30 @@
 
       if (i === out.current) {
         item.addClass('current');
-        footItem.addClass('current_footitem');
+        thumbnail.addClass('thumbnail_current');
       }
 
       if (i > out.current) {
         item.addClass('new');
       }
+
       out.cacheItems.push(item);
-      out.cacheFoot.push(footItem);
+      out.thumbnails.push(thumbnail);
     });
 
     out.update = function (newData) {
       if (!out.stopped) {
         out.cacheItems.push(genItem(newData).addClass('new'));
-        out.cacheFoot.push(genFootItem(newData));
+        out.thumbnails.push(genThumbnail(newData));
 
-        if ( out.current  <= out.center) { // get back to center
+        if (out.current <= out.center) { // get back to center
           this.next();
         }
 
         $('#container :first').remove();
-        $('#foot_center :first').remove();
+        $('#thumbnails :first').remove();
         out.cacheItems.shift();
-        out.cacheFoot.shift();
+        out.thumbnails.shift();
         out.current -= 1;
       }
     };
@@ -70,9 +72,8 @@
     out.next = function () {
       if (!(out.current === out.cacheItems.length)) {
         $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
-        $('.current_footitem').removeClass('current_footitem').next().addClass('current_footitem');
+        $('.thumbnail_current').removeClass('thumbnail_current').next().addClass('thumbnail_current');
         out.current += 1;
-        //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
       } else {
         log('Already at the last image');
@@ -82,7 +83,7 @@
     out.prev = function () {
       if (!(out.current === 1)) {
         $('.current').removeClass('current').addClass('new').prev().removeClass('old').addClass('current');
-        $('.current_footitem').removeClass('current_footitem').prev().addClass('current_footitem');
+        $('.thumbnail_current').removeClass('thumbnail_current').prev().addClass('thumbnail_current');
         out.current -= 1;
         adjustRatio();
       } else {
@@ -139,10 +140,10 @@
     return next;
   }
 
-  function genFootItem(imageData) {
+  function genThumbnail(imageData) {
     var next = $('<img src="' + imageData + '" />');
-    next.addClass('foot_item');
-    $('#foot_center').append(next);
+    next.addClass('thumbnail');
+    $('#thumbnails').append(next);
     return next;
   }
 
