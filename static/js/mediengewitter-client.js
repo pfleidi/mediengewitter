@@ -12,77 +12,126 @@
 (function (window, document, undefined) {
   var cache = false;
 
-  function createCache(cacheSize,initData) {
+  function log(msg) {
+    try {
+      console.log(msg);
+    } catch (e) { }
+  }
+
+  function createCache(initData) {
     var out = {};
-    $('#container').empty()
+
+    $('#container').empty();
+
     out.stopped = false;
     out.cacheItems = [];
-    out.center = Math.floor((cacheSize+1)/2)
+    out.thumbnails = [];
+
+    out.center = Math.floor((initData.length + 1) / 2);
     out.current = out.center;
-    for (var i = 1; i <= cacheSize;i++) {
-      var item = genItem(initData);
-      if ( i < out.current ) {
+
+    initData.forEach(function (img) {
+      var item = genItem(img),
+      thumbnail = genThumbnail(img),
+      i = initData.indexOf(img) + 1;
+
+      if (i < out.current) {
         item.addClass('old');
       }
 
-      if ( i == out.current ) {
+      if (i === out.current) {
         item.addClass('current');
+        thumbnail.addClass('thumbnail_current');
       }
 
-      if ( i > out.current ) {
+      if (i > out.current) {
         item.addClass('new');
       }
-      out.cacheItems.push(item);
-    }
 
-    out.update = function (newData)
-    {
-      if ( ! out.stopped )
-      {
+      out.cacheItems.push(item);
+      out.thumbnails.push(thumbnail);
+    });
+
+    out.update = function (newData) {
+      if (!out.stopped) {
         out.cacheItems.push(genItem(newData).addClass('new'));
-        if ( out.current  <= out.center) { // get back to center 
+        out.thumbnails.push(genThumbnail(newData));
+
+        if (out.current <= out.center) { // get back to center
           this.next();
         }
 
-        $('#container :first').remove()
+        $('#container :first').remove();
+        $('#thumbnails :first').remove();
         out.cacheItems.shift();
+        out.thumbnails.shift();
         out.current -= 1;
       }
-    }
+    };
 
     out.next = function () {
-      if ( ! (out.current == out.cacheItems.length )) {
+      if (!(out.current === out.cacheItems.length)) {
         $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
+        $('.thumbnail_current').removeClass('thumbnail_current').next().addClass('thumbnail_current');
         out.current += 1;
-        //$('#container :nth-child('+(out.current) +')').removeClass('new').addClass('current');
         adjustRatio();
-      }else{
-        console.log('Already at the last image');
+      } else {
+        log('Already at the last image');
       }
-    }
+    };
 
     out.prev = function () {
-      if ( ! (out.current == 1 )) {
+      if (!(out.current === 1)) {
         $('.current').removeClass('current').addClass('new').prev().removeClass('old').addClass('current');
- ;
+        $('.thumbnail_current').removeClass('thumbnail_current').prev().addClass('thumbnail_current');
         out.current -= 1;
         adjustRatio();
-      }else{
-        console.log('Already at the first image');
+      } else {
+        log('Already at the first image');
       }
-    }
+    };
 
     out.toggleStop = function () {
       out.stopped = !out.stopped;
-    }
-    return out;
+    };
 
+    return out;
   }
-  var enabled = true;
-  var sections = [];
+
+  var enabled = true,
+  sections = [];
 
   function isSupported() {
     return 'WebSocket' in window;
+  }
+
+  function connect() {
+    if (isSupported()) {
+      var socket = new WebSocket(getWebSocketUri());
+
+      socket.onmessage = function (msg) {
+        var data = msg.data,
+        imageData = JSON.parse(data);
+
+        if (Array.isArray(imageData)) {
+          cache = createCache(imageData);
+        } else {
+          cache.update(imageData.data);
+        }
+
+      };
+
+      socket.onerror = function () {
+        log('Error!');
+        setTimeout(1000, connect);
+      };
+
+      socket.onclose = function () {
+        log('Connection closed');
+        setTimeout(1000, connect);
+      };
+    }
+
   }
 
   function genItem(imageData) {
@@ -91,15 +140,21 @@
     return next;
   }
 
+  function genThumbnail(imageData) {
+    var next = $('<img src="' + imageData + '" />');
+    next.addClass('thumbnail');
+    $('#thumbnails').append(next);
+    return next;
+  }
+
   function adjustRatio() {
     var img = $('.current :first-child');
-    console.log(img);
+    log(img);
     img.aeImageResize({
       height: $('.current').height(),
       width: $('.current').width()
     });
   }
-
 
   function getWebSocketUri() {
     return "ws://"
@@ -110,6 +165,7 @@
 
   $(document).ready(function () {
     adjustRatio();
+    connect();
   });
 
   $(window).resize(function () {
@@ -134,28 +190,5 @@
       cache.prev();
     }
   });
-
-
-  (function connect() {
-    if (isSupported()) {
-      var socket = new WebSocket(getWebSocketUri());
-
-      socket.onmessage = function (msg) {
-        console.log(msg.data);
-        var data = msg.data;
-        var imageData = JSON.parse(data);
-        if (!cache){
-          cache = createCache(5,imageData.data)
-        }else {
-          cache.update(imageData.data);
-        }
-      }
-      socket.onclose = function () {
-        console.log('conncection closed');
-        setTimeout(1000, connect);
-      };
-    };
-    
-  }())
 
 }(window, document));
