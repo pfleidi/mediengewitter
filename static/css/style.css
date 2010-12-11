@@ -29,6 +29,10 @@ footer, header, hgroup, menu, nav, section {
   display:block;
 }
 
+body {
+  overflow: hidden;
+}
+
 .gray_gradient {
   background-color: #161616;
   background: -webkit-gradient(linear, top, bottom, from(#161616), to(#131313));
@@ -48,7 +52,7 @@ footer, header, hgroup, menu, nav, section {
 header {
   width : 100%;
   height: 2.5em;
-  border-bottom: 5px solid #acd86e;
+  border-bottom: 1px solid #acd86e;
 }
 
 header .heading {
@@ -150,7 +154,7 @@ footer {
   position:fixed;
   bottom:0px;
   height: 2em;
-  border-top: 5px solid #acd86e;
+  border-top: 1px solid #acd86e;
 }
 
 footer > div {
