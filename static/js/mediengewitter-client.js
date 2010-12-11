@@ -23,8 +23,6 @@
       $('#container').empty();
 
       out.stopped = false;
-      out.cacheItems = [];
-      out.thumbnails = [];
 
       out.center = Math.floor((initData.length + 1) / 2);
       out.current = out.center;
@@ -47,14 +45,12 @@
             item.addClass('new');
           }
 
-          out.cacheItems.push(item);
-          out.thumbnails.push(thumbnail);
         });
 
       out.update = function (newData) {
         if (!out.stopped) {
-          out.cacheItems.push(genItem(newData).addClass('new'));
-          out.thumbnails.push(genThumbnail(newData));
+          genItem(newData).addClass('new');
+          genThumbnail(newData);
 
           if (out.current <= out.center) { // get back to center
             this.next();
@@ -69,7 +65,7 @@
       };
 
       out.next = function () {
-        if (!(out.current === out.cacheItems.length)) {
+        if (!(out.current === $('#container *').length)) {
           $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
           $('.thumbnail_current').removeClass('thumbnail_current').next().addClass('thumbnail_current');
           out.current += 1;
@@ -87,6 +83,17 @@
           adjustRatio();
         } else {
           log('Already at the first image');
+        }
+      };
+      out.switchTo = function (ident) {
+        if (ident == out.current)
+          return;
+        while (ident != out.current) {
+          if (ident < out.current) {
+            out.prev();
+          } else {
+            out.next();
+          }
         }
       };
 
@@ -122,15 +129,22 @@
 
     }
 
+    function switchToImage() {
+      console.dir($(this));
+      cache.switchTo(1);
+    }
+
     function genItem(imageData) {
       var next = $('<section><img src="' + imageData + '" /></section>');
       $('#container').append(next);
+
       return next;
     }
 
     function genThumbnail(imageData) {
       var next = $('<img src="' + imageData + '" />');
       next.addClass('thumbnail');
+      next.click(switchToImage);
       $('#thumbnails').append(next);
       return next;
     }
