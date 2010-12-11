@@ -11,15 +11,13 @@
  */
 
 var Connect = require('connect'),
-Websocket = require('websocket-server'),
 Fs = require('fs'),
-Log4js = require('log4js'),
-Appender = require('./lib/colorappender'),
+Log4js = require('log4js')(),
+Io = require('socket.io'),
 PORT = 8080,
 WEBROOT = __dirname + '/static',
 LOGFILE = __dirname + '/log/mediengewitter.log';
 
-Log4js.addAppender(Appender.consoleAppender());
 Log4js.addAppender(Log4js.fileAppender(LOGFILE), 'mediengewitter');
 
 var logger = Log4js.getLogger('mediengewitter');
@@ -48,17 +46,16 @@ httpServer.listen(PORT, function () {
     logger.debug('Webserver successfully started.');
   });
 
-var webSocketServer = Websocket.createServer({
-    debug: true,
-    server: httpServer
+var webSocketServer = Io.listen(httpServer, {
+    flashPolicyServer: false,
+    log: function () { logger.debug }
   });
 
-webSocketServer.addListener('connection', function (connection) {
+webSocketServer.on('connection', function (connection) {
     var cache = imageCache.cache();
-    console.dir(cache);
     connection.send(JSON.stringify(cache));
 
-    connection.addListener('message', function(message) {
+    connection.on('message', function(message) {
         log.info('Got msg: ' + message);
       });
   });
