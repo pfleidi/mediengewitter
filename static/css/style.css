@@ -129,6 +129,10 @@ section.old {
   -o-transition: all 0.25s ease-in-out;
   transition: all 0.25s ease-in-out;
 }
+#thumbnails > .thumbnail:hover {
+  cursor:pointer;
+}
+
 
 #thumbnails > .thumbnail_current{
   -webkit-transform: scale(1.2);

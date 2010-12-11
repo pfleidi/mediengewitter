@@ -58,8 +58,6 @@
 
           $('#container :first').remove();
           $('#thumbnails :first').remove();
-          out.cacheItems.shift();
-          out.thumbnails.shift();
           out.current -= 1;
         }
       };
@@ -131,7 +129,16 @@
 
     function switchToImage() {
       console.dir($(this));
-      cache.switchTo(1);
+      clicked = $(this);
+      realId = 1;
+      $('.thumbnail').each( function ( index ) {
+        console.dir($(this));
+        if ( clicked[0].src == $(this)[0].src) {
+          realId = index;
+        }
+      });
+      realId += 1;
+      cache.switchTo(realId);
     }
 
     function genItem(imageData) {
