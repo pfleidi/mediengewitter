@@ -128,11 +128,9 @@
     }
 
     function switchToImage() {
-      console.dir($(this));
       clicked = $(this);
       realId = 1;
       $('.thumbnail').each( function ( index ) {
-        console.dir($(this));
         if ( clicked[0].src == $(this)[0].src) {
           realId = index;
         }
