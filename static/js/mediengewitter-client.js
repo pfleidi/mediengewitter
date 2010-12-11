@@ -63,7 +63,7 @@
       };
 
       out.next = function () {
-        if (!(out.current === $('#container *').length)) {
+        if (!(out.current === $('section').length)) {
           $('.current').removeClass('current').addClass('old').next().removeClass('new').addClass('current');
           $('.thumbnail_current').removeClass('thumbnail_current').next().addClass('thumbnail_current');
           out.current += 1;
@@ -184,16 +184,14 @@
           return;
         }
 
+        e.preventDefault();
         if (e.keyCode === 32) {
-          e.preventDefault();
           cache.toggleStop();
         }
         if (e.keyCode === 39) {
-          e.preventDefault();
           cache.next();
         }
         if (e.keyCode === 37) {
-          e.preventDefault();
           cache.prev();
         }
       });
