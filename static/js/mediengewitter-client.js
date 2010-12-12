@@ -121,11 +121,6 @@
           } catch (err) {
             log('Error while parsing data:' + err);
           }
-          if ($.isArray(imageData)) {
-            cache = createCache(imageData);
-          } else {
-            cache.update(imageData.data);
-          }
 
         });
 
