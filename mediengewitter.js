@@ -16,17 +16,25 @@ Log4js = require('log4js')(),
 Io = require('socket.io'),
 PORT = 8080,
 WEBROOT = __dirname + '/static',
-LOGFILE = __dirname + '/log/mediengewitter.log';
+LOGFILE = __dirname + '/log/mediengewitter.log',
+MODULE_FOLDER = __dirname + "/modules/";
 
 Log4js.addAppender(Log4js.fileAppender(LOGFILE), 'mediengewitter');
 
 var logger = Log4js.getLogger('mediengewitter');
 logger.setLevel('DEBUG');
 
+var modules = {};
+function getPluginName(fileName) {
+  return fileName.split('.')[0];
+}
+
+
+
 //TODO make options changeable via commandline params
 var IMAGE_PATH = "static/content/",
 NEW_IMAGES_FILE = IMAGE_PATH + "imageSum",
-imageCache = require('./lib/imagecache').createCache(NEW_IMAGES_FILE, logger),
+imageCache = require('./lib/imagecache.js').createCache(NEW_IMAGES_FILE, logger),
 DELAY = 7500;
 
 var logStream = Fs.createWriteStream(__dirname + '/log/access.log', {
@@ -47,25 +55,44 @@ httpServer.listen(PORT, function () {
   });
 
 var webSocketServer = Io.listen(httpServer, {
-    flashPolicyServer: false,
-    log: function () { logger.debug }
+    flashPolicyServer: false
   });
+
+(function initModules() { // client side modules
+  Fs.readdirSync(MODULE_FOLDER).forEach(function (file) {
+      if (/\.js$/.test(file)) {
+        var name = getPluginName(file),
+        logger = Log4js.getLogger(name);
+
+        modules[name] = require(MODULE_FOLDER + name).create(logger,webSocketServer);
+    }
+  });
+}());
 
 webSocketServer.on('connection', function (connection) {
     var cache = imageCache.cache();
     connection.send(JSON.stringify(cache));
 
-    connection.on('message', function(message) {
-        log.info('Got msg: ' + message);
-      });
+
+    connection.on('message', function (message) {
+      try {
+        var msg = JSON.parse(message);
+        dispatch(msg,connection);
+      } catch (err) {
+        logger.error('Cannot parse or eval message:' + err);
+      }
+      }); 
   });
+
+function dispatch(msg,connection) {
+  modules[msg.type].dispatch(msg.payload,connection);
+}
 
 (function doAction() {
     var currImage = imageCache.nextImage();
-    logger.info("Current Image is : " + currImage);
-    var toSend = JSON.stringify({ data: 'content/' + currImage });
+    //TODO pfleidi writes unit tests
+    logger.info("Current Image is : " + currImage.payload.data);
+    var toSend = JSON.stringify(currImage);
     webSocketServer.broadcast(toSend);
     setTimeout(doAction, DELAY);
   }());
-
-

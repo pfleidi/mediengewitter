@@ -110,8 +110,17 @@
       socket.connect();
 
       socket.on('message', function (data) {
-          var imageData = JSON.parse(data);
-
+          try {
+            var msg = JSON.parse(data);
+            switch (msg.type) {
+              case 'cache' : evalCache(msg.payload);
+                break;
+              default:
+                log('unknown type');
+            }
+          } catch (err) {
+            log('Error while parsing data:' + err);
+          }
           if ($.isArray(imageData)) {
             cache = createCache(imageData);
           } else {
@@ -125,6 +134,18 @@
           setTimeout(1000, connect);
         });
 
+    }
+    function evalCache(payload){
+      switch (payload.action) {
+        case 'init' :
+          cache = createCache(payload.data);
+          break;
+        case 'nextImage' :
+          cache.update(payload.data);
+          break;
+        default:
+          log('unknown action');
+      }
     }
 
     function switchToImage() {
