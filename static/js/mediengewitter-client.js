@@ -18,6 +18,7 @@
     }
 
     function createCache(initData) {
+
       var out = {};
 
       $('#container').empty();
@@ -108,6 +109,13 @@
     function connect() {
       var socket = new io.Socket(window.location.hostname, { port: window.location.port });
       socket.connect();
+      function sendText() {
+        var text = $('#chatInput').val();
+        socket.send(JSON.stringify ( { type : 'chat', payload : { action: "msg", data : text}}));
+        $('#chatInput').val('');
+      }
+      $('#chatfield').click ( sendText);
+
 
       socket.on('message', function (data) {
           try {
@@ -115,8 +123,11 @@
             switch (msg.type) {
               case 'cache' : evalCache(msg.payload);
                 break;
+              case 'chat' : evalChat(msg.payload);
+                break;
               default:
-                log('unknown type');
+                console.dir(msg)
+                log('unknown type'+ msg.type );
             }
           } catch (err) {
             log('Error while parsing data:' + err);
@@ -140,6 +151,14 @@
           break;
         default:
           log('unknown action');
+      }
+    }
+    function evalChat(payload) {
+      switch (payload.action) {
+        case 'msg' : $('#chatfield').append(payload.data + '<br/>');
+          break;
+        default :
+          log('unknown chat action');
       }
     }
 
@@ -196,18 +215,23 @@
       });
 
     $(document).keydown(function (e) {
+        if (/^(input|textarea)$/i.test(e.target.nodeName) || e.target.isContentEditable) {
+          return;
+        }
         if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !cache) {
           return;
         }
 
-        e.preventDefault();
         if (e.keyCode === 32) {
+        e.preventDefault();
           cache.toggleStop();
         }
         if (e.keyCode === 39) {
+        e.preventDefault();
           cache.next();
         }
         if (e.keyCode === 37) {
+        e.preventDefault();
           cache.prev();
         }
       });

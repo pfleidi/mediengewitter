@@ -12,6 +12,7 @@
 
 var Connect = require('connect'),
 Fs = require('fs'),
+Sys = require('sys'),
 Log4js = require('log4js')(),
 Io = require('socket.io'),
 PORT = 8080,
@@ -65,6 +66,7 @@ var webSocketServer = Io.listen(httpServer, {
         logger = Log4js.getLogger(name);
 
         modules[name] = require(MODULE_FOLDER + name).create(logger,webSocketServer);
+        logger.debug('loaded client module :'+name);
     }
   });
 }());
@@ -85,6 +87,8 @@ webSocketServer.on('connection', function (connection) {
   });
 
 function dispatch(msg,connection) {
+  logger.debug(Sys.inspect(msg));
+  logger.debug(Sys.inspect(modules))
   modules[msg.type].dispatch(msg.payload,connection);
 }
 

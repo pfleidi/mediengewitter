@@ -133,10 +133,10 @@ section.old {
   -o-transition: all 0.25s ease-in-out;
   transition: all 0.25s ease-in-out;
 }
+
 #thumbnails > .thumbnail:hover {
   cursor:pointer;
 }
-
 
 #thumbnails > .thumbnail_current{
   -webkit-transform: scale(1.2);
@@ -165,4 +165,27 @@ footer > div {
 footer a {
   color: #e0e0e0;
   margin: 0em 1em;
+}
+
+#chat {
+  width: 200px;
+  font-size : 0.8em;
+
+  position: fixed;
+  top: 30%;
+  left: 1em;
+  z-index: 23;
+  border: 1px solid #666;
+}
+#chatfield {
+  overflow: auto;
+  opacity : 0.5;
+  height: 100px;
+  width:200px;
+  background: #C0C0C0;
+
+}
+#chatInput {
+  width:195px;
+  font-size : 0.8em;
 }
