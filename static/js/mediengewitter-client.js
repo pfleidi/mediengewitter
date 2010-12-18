@@ -9,7 +9,8 @@
  */
 
 (function (window, document, undefined) {
-    var cache = false;
+    var cache = false,
+        socket = false;
 
     function log(msg) {
       try {
@@ -107,15 +108,19 @@
     var enabled = true,
     sections = [];
 
-    function connect() {
-      var socket = new io.Socket(window.location.hostname, { port: window.location.port });
-      socket.connect();
-      function sendText() {
-        var text = $('#chatInput').val();
-        socket.send(JSON.stringify ( { type : 'chat', payload : { action: "msg", data : text}}));
-        $('#chatInput').val('');
+    function sendText() {
+      var text = $('#chatInput').val();
+      if ( text === '') {
+        return;
       }
-      $('#chatfield').click ( sendText);
+      socket.send(JSON.stringify ( { type : 'chat', payload : { action: "msg", data : text}}));
+      $('#chatInput').val('');
+    }
+    
+    function connect() {
+      socket = new io.Socket(window.location.hostname, { port: window.location.port });
+      socket.connect();
+      $('#chatbutton').click ( sendText);
 
 
 
@@ -144,10 +149,12 @@
           setTimeout(1000, connect);
         });
       // swipe gestures
-      $('#container').swipe({
-             swipeLeft: function() { cache.next() },
-             swipeRight: function() { cache.prev() },
-      })
+      $('#container').touchwipe({
+             wipeLeft: function() { cache.next() },
+           wipeRight: function() { cache.prev() },
+           min_move_x: 20,
+           preventDefaultEvents: true
+      });
 
     }
     function evalCache(payload){
@@ -225,6 +232,9 @@
 
     $(document).keydown(function (e) {
         if (/^(input|textarea)$/i.test(e.target.nodeName) || e.target.isContentEditable) {
+          if (e.keyCode === 13) {
+            sendText()
+          }
           return;
         }
         if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !cache) {
