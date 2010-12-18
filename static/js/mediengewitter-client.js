@@ -84,6 +84,7 @@
           log('Already at the first image');
         }
       };
+
       out.switchTo = function (ident) {
         if (ident == out.current)
           return;
@@ -117,6 +118,7 @@
       $('#chatfield').click ( sendText);
 
 
+
       socket.on('message', function (data) {
           try {
             var msg = JSON.parse(data);
@@ -124,6 +126,8 @@
               case 'cache' : evalCache(msg.payload);
                 break;
               case 'chat' : evalChat(msg.payload);
+                chatfield =  document.getElementById('chatfield');
+                chatfield.scrollTop = chatfield.scrollHeight;
                 break;
               default:
                 console.dir(msg)
@@ -139,6 +143,11 @@
           log('Connection closed');
           setTimeout(1000, connect);
         });
+      // swipe gestures
+      $('#container').swipe({
+             swipeLeft: function() { cache.next() },
+             swipeRight: function() { cache.prev() },
+      })
 
     }
     function evalCache(payload){
