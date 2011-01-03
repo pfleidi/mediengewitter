@@ -43,17 +43,22 @@ module.exports = testCase({
       var Cache = this.Cache,
       img = new this.Image(img1);
 
-
-      img.save(function () {
-          Cache.createEntry(img, function () {
-              Cache.find().last(function (entry) {
-                  test.strictEqual(entry.url, img.url);
-                  test.deepEqual(entry.tags, img.tags);
-                  test.strictEqual(entry.path, img.path);
-                  test.strictEqual(entry._image.toHexString(), img._id.toHexString());
-                  test.done();
-                });
-            });
+      Step( 
+        function () { 
+          img.save(this) 
+        },
+        function () {
+          Cache.createEntry(img, this);
+        },
+        function () {
+          Cache.find().last(this);
+        },
+        function (entry) {
+          test.strictEqual(entry.url, img.url);
+          test.deepEqual(entry.tags, img.tags);
+          test.strictEqual(entry.path, img.path);
+          test.strictEqual(entry._image.toHexString(), img._id.toHexString());
+          test.done();
         });
 
       setTimeout(1500, function () {
