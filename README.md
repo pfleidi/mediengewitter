@@ -9,9 +9,5 @@ Dependencies
 
 Mediengewitter needs a number of 3rd party libraries. You can install them with [npm](http://npmjs.org):
 
-    npm install connect socket.io log4js
+    npm install connect socket.io log4js step nodeunit mongoose
 
-For the background setter client you need
-    python >2.6
-    [python-websockets](fork http://github.com/hamax/python-websocket)
-    some tool to change your background
