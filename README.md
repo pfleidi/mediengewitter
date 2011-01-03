@@ -9,5 +9,4 @@ Dependencies
 
 Mediengewitter needs a number of 3rd party libraries. You can install them with [npm](http://npmjs.org):
 
-    npm install connect socket.io log4js step nodeunit mongoose
-
+    npm install connect socket.io log4js sanitizer step nodeunit sass mongoose
