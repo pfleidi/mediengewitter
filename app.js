@@ -8,6 +8,7 @@
 
 var Express = require('express');
 var Log4js = require('log4js')();
+var Fs = require('fs');
 var Ws = require('./lib/websocket.js');
 var PORT = 8080;
 var LOGFILE = __dirname + '/logs/mahBucket.log';
@@ -23,13 +24,8 @@ app.configure(function () {
     app.set('view engine', 'jade');
     app.use(Express.bodyDecoder());
     app.use(Express.cookieDecoder());
-    app.use(Express.logger());
     app.use(Express.methodOverride());
     app.use(Express.session());
-    app.use(Express.compiler({
-        src: __dirname + '/public',
-        enable: ['sass'] 
-      }));
     app.use(app.router);
     app.use(Express.staticProvider(__dirname + '/public'));
   });
@@ -43,13 +39,18 @@ app.configure('development', function () {
   });
 
 app.configure('production', function () {
+    var accessLog = Fs.createWriteStream(__dirname + '/logs/access.log', {
+        encoding: 'utf-8',
+        flags: 'a'
+      });
+    app.use(Express.logger({ stream: accessLog }));
     app.use(Express.errorHandler());
     Log4js.addAppender(Log4js.fileAppender(LOGFILE));
     logger.setLevel('WARNING');
   });
 
 app.listen(PORT, function () {
-    logger.info('mahBucket server listening on port' + app.address().port);
+    logger.info('mahBucket server listening on port: ' + app.address().port);
     Ws.createWebsocketServer(app, logger);
   });
 
