@@ -22,7 +22,7 @@ Userinterfaces
 
 - Thumbnails
 - Working image scaling
-- Touch-Swipe (implemented)
+- Add UI controls
 
 Picture upload
 -------------
@@ -41,9 +41,3 @@ Testing
 
 - Unittests for backend
 - Unittests for frontend (zombie.js)
-
-Express Framework
------------------
-
-- Migrate app to express structure
-- Move websocket server to new module to keep the app.js clean
