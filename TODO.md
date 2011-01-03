@@ -23,6 +23,8 @@ Userinterfaces
 - Thumbnails
 - Working image scaling
 - Add UI controls
+- Add "frozen" pause mode
+
 
 Picture upload
 -------------
