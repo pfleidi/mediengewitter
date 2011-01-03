@@ -1,41 +1,49 @@
 TODOs
 =====
 
-
-Fahrplan
+Schedule
 ========
 
-Datenbankanbindung
-------------------
-- Gridfs fuer Bilder
-- Persistenter Cache
-- Userverwaltung
-- Metadaten einbinden
-- Echte zufaelligkeit beim laden von Daten
+Database
+--------
 
-Voting fuer Dokumente
----------------------
-- Brainstorming Umsetzung
+- Gridfs to store pictures
+- Persistent cache
+- User management
+- Add meta data 
+
+Image voting
+------------
+
+- ...
 
 Userinterfaces
 --------------
-- Thumbnails
-- Skalierung
-- Touch-Swipe (fertig)
 
-Bilder-Upload
+- Thumbnails
+- Working image scaling
+- Touch-Swipe (implemented)
+
+Picture upload
 -------------
-- In globale Timeline einfuegen
+
+- Allow users to upload new pictures
+- Add new uploaded pictures to global bucket
 
 Logs
 ----
-- Statistiken
+
+- User statistics
+- Proper error logging
 
 Testing
 -------
-- Unittest fuer Backend
-- Unittest fuer Frontend (zombie.js)
+
+- Unittests for backend
+- Unittests for frontend (zombie.js)
 
 Express Framework
-----------------
+-----------------
 
+- Migrate app to express structure
+- Move websocket server to new module to keep the app.js clean
