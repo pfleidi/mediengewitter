@@ -35,7 +35,7 @@ app.configure('development', function () {
         dumpExceptions: true,
         showStack: true 
       }));
-    logger.setLevel('WARNING');
+    logger.setLevel('DEBUG');
   });
 
 app.configure('production', function () {
@@ -43,10 +43,11 @@ app.configure('production', function () {
         encoding: 'utf-8',
         flags: 'a'
       });
+
     app.use(Express.logger({ stream: accessLog }));
     app.use(Express.errorHandler());
     Log4js.addAppender(Log4js.fileAppender(LOGFILE));
-    logger.setLevel('WARNING');
+    logger.setLevel('ERROR');
   });
 
 app.listen(PORT, function () {
