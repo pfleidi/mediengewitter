@@ -106,8 +106,7 @@
     sections = [];
 
     function connect() {
-      var socket = new io.Socket(window.location.hostname, { port: window.location.port });
-      socket.connect();
+      var socket = io.connect();
 
       socket.on('message', function (data) {
           var imageData = JSON.parse(data);
