@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "connect": "*",
+    "connect-cache": "*",
+    "log4js": "*",
+    "socket.io": "*"
+  }
+}
