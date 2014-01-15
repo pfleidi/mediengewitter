@@ -12,13 +12,15 @@
 
 var Connect = require('connect'),
 Fs = require('fs'),
-Log4js = require('log4js')(),
+Log4js = require('log4js'),
 Io = require('socket.io'),
+Http = require('http'),
 PORT = 8080,
 WEBROOT = __dirname + '/static',
 LOGFILE = __dirname + '/log/mediengewitter.log';
 
-Log4js.addAppender(Log4js.fileAppender(LOGFILE), 'mediengewitter');
+Log4js.loadAppender('file');
+Log4js.addAppender(Log4js.appenders.file(LOGFILE), 'mediengewitter');
 
 var logger = Log4js.getLogger('mediengewitter');
 logger.setLevel('DEBUG');
@@ -34,13 +36,17 @@ var logStream = Fs.createWriteStream(__dirname + '/log/access.log', {
     flags: 'a'
   });
 
-var httpServer = Connect.createServer(
-  Connect.cache(),
-  Connect.staticProvider(WEBROOT),
-  Connect.gzip(),
+var app = Connect();
+var httpServer = Http.createServer(app);
+
+[
+  Connect.static(WEBROOT),
+  Connect.compress(),
   Connect.logger(),
   Connect.errorHandler({ showStack: true, dumpExceptions: true})
-);
+].forEach(function (middleware) {
+  app.use(middleware);
+});
 
 httpServer.listen(PORT, function () {
     logger.debug('Webserver successfully started.');
@@ -64,7 +70,7 @@ webSocketServer.on('connection', function (connection) {
     var currImage = imageCache.nextImage();
     logger.info("Current Image is : " + currImage);
     var toSend = JSON.stringify({ data: 'content/' + currImage });
-    webSocketServer.broadcast(toSend);
+    webSocketServer.sockets.send(toSend);
     setTimeout(doAction, DELAY);
   }());
 
